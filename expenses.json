@@ -1,0 +1,13 @@
+[ {
+  "id" : "9f1fae83-df9e-45a2-bc52-79a8a49e10a3",
+  "amount" : 500,
+  "category" : "transport",
+  "date" : "2026-10-07",
+  "description" : "car"
+}, {
+  "id" : "2082b407-6db4-4df6-8924-076d1bc2ffdf",
+  "amount" : 67,
+  "category" : "burger",
+  "date" : "2026-10-07",
+  "description" : "burger king"
+} ]
