@@ -12,6 +12,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ExpenseService service = new ExpenseService();
+        System.out.println("The file is being saved to: " + new java.io.File("expenses.json").getAbsolutePath());
 
         System.out.println("Personal Expense Analyzer");
 
