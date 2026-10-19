@@ -9,7 +9,7 @@ public class ExpenseService {
 
     public ExpenseService() {
         this.storageService = new JsonStorageService();
-        this.expenses = storageService.Load();
+        this.expenses = storageService.Load(); // если метод называется с заглавной, укажи Load()
     }
 
     public void addExpense(Expense expense) {
@@ -19,5 +19,22 @@ public class ExpenseService {
 
     public List<Expense> getAllExpenses() {
         return expenses;
+    }
+
+    public boolean deleteExpense(int index) {
+        if (index >= 0 && index < expenses.size()) {
+            expenses.remove(index);
+            storageService.save(expenses);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateExpense(int index, Expense updatedExpense) {
+        if (index >= 0 && index < expenses.size()) {
+            expenses.set(index, updatedExpense);
+            storageService.save(expenses);
+        }
+        return false;
     }
 }

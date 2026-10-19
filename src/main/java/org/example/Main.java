@@ -12,7 +12,6 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ExpenseService service = new ExpenseService();
-        System.out.println("The file is being saved to: " + new java.io.File("expenses.json").getAbsolutePath());
 
         System.out.println("Personal Expense Analyzer");
 
@@ -20,19 +19,23 @@ public class Main {
             System.out.println("Select an action:");
             System.out.println("1. Add an expense");
             System.out.println("2. Show all expenses");
-            System.out.println("3. Exit:");
-            System.out.println("> ");
+            System.out.println("3. Delete an expense");
+            System.out.println("4. Edit an expense");
+            System.out.println("5. Exit:");
+            System.out.print("> ");
 
             String choice = scanner.nextLine();
 
             switch (choice) {
                 case "1" -> addExpenseMenu(scanner, service);
                 case "2" -> printAllExpenses(service);
-                case "3" -> {
+                case "3" -> deleteExpenseMenu(scanner, service);
+                case "4" -> editExpenseMenu(scanner, service);
+                case "5" -> {
                     System.out.println("Bye");
                     return;
                 }
-                default  -> System.out.println("Invalid command. Try again.");
+                default -> System.out.println("Invalid command. Try again.");
             }
         }
     }
@@ -40,19 +43,12 @@ public class Main {
     private static void addExpenseMenu(Scanner scanner, ExpenseService service) {
         System.out.print("Enter the amount: ");
         BigDecimal amount = new BigDecimal(scanner.nextLine());
-
         System.out.print("Enter the category (Food, transport and other): ");
         String category = scanner.nextLine();
         System.out.print("Enter the description: ");
         String description = scanner.nextLine();
-        Expense expense = new Expense(
-                UUID.randomUUID().toString(),
-                amount,
-                category,
-                LocalDate.now(),
-                description
-        );
-        service.addExpense(expense);
+
+        service.addExpense(new Expense(UUID.randomUUID().toString(), amount, category, LocalDate.now(), description));
         System.out.println("Successfully added!");
     }
 
@@ -63,8 +59,47 @@ public class Main {
             return;
         }
         System.out.println("Your expenses");
-        for (Expense e : list) {
-            System.out.println(e);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println((i + 1) + ". " + list.get(i));
         }
+    }
+
+    private static void deleteExpenseMenu(Scanner scanner, ExpenseService service) {
+        printAllExpenses(service);
+        if (service.getAllExpenses().isEmpty()) return;
+
+        System.out.print("Enter number to delete: ");
+        int index = Integer.parseInt(scanner.nextLine()) - 1;
+
+        if (service.deleteExpense(index)) {
+            System.out.println("Successfully deleted!");
+        } else {
+            System.out.println("Invalid number.");
+        }
+    }
+
+    private static void editExpenseMenu(Scanner scanner, ExpenseService service) {
+        printAllExpenses(service);
+        var list = service.getAllExpenses();
+        if (list.isEmpty()) return;
+
+        System.out.print("Enter number to edit: ");
+        int index = Integer.parseInt(scanner.nextLine()) - 1;
+
+        if (index < 0 || index >= list.size()) {
+            System.out.println("Invalid number.");
+            return;
+        }
+
+        Expense old = list.get(index);
+        System.out.print("Enter amount: ");
+        BigDecimal amount = new BigDecimal(scanner.nextLine());
+        System.out.print("Enter category: ");
+        String category = scanner.nextLine();
+        System.out.print("Enter description: ");
+        String description = scanner.nextLine();
+
+        service.updateExpense(index, new Expense(old.getId(), amount, category, old.getDate(), description));
+        System.out.println("Successfully updated!");
     }
 }
