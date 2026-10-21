@@ -1,0 +1,1 @@
+I built a Java Expense Tracker that uses a layered architecture. The core business logic lives in ExpenseService, while file reading and writing is handled separately by JsonStorageService. Users can add, view, edit, and delete expenses through the console interface in Main.java, and all changes are automatically saved to expenses.json.
