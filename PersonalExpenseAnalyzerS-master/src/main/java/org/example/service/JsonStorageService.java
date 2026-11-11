@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JsonStorageService {
-    private final String filePath = "expenses.json";
+    // Using an absolute path to the project root directory
+    private final String filePath = System.getProperty("user.dir") + File.separator + "expenses.json";
     private final ObjectMapper objectMapper;
 
     public JsonStorageService() {
@@ -21,23 +22,31 @@ public class JsonStorageService {
         this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    public void save(List<Expense> expenses) {
+    public void saveExpenses(List<Expense> expenses) {
         try {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), expenses);
+            File file = new File(filePath);
+            System.out.println(">>> SAVING FILE TO: " + file.getAbsolutePath());
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, expenses);
+            System.out.println(">>> FILE SAVED SUCCESSFULLY! Items count: " + expenses.size());
         } catch (IOException e) {
-                System.out.println("Error saving expenses to file: " + e.getMessage());
+            System.out.println(">>> ERROR SAVING JSON:");
+            e.printStackTrace();
         }
     }
 
-    public List<Expense> Load() {
+    public List<Expense> loadExpenses() {
         File file = new File(filePath);
+        System.out.println(">>> LOADING FROM FILE: " + file.getAbsolutePath() + " (Exists: " + file.exists() + ")");
         if (!file.exists()) {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(file, new TypeReference<List<Expense>>() {});
+            List<Expense> loaded = objectMapper.readValue(file, new TypeReference<List<Expense>>() {});
+            System.out.println(">>> SUCCESSFULLY LOADED items: " + loaded.size());
+            return loaded;
         } catch (IOException e) {
-            System.out.println("Error reading file, creating a new list: " + e.getMessage());
+            System.out.println(">>> ERROR READING FILE:");
+            e.printStackTrace();
             return new ArrayList<>();
         }
     }

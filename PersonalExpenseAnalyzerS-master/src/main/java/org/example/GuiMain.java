@@ -48,7 +48,6 @@ public class GuiMain extends JFrame {
         table.setRowHeight(30);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Привязываем иконки со всеми котиками к шапке таблицы
         table.getColumnModel().getColumn(0).setHeaderRenderer(new ImageHeaderRenderer("spy.png"));
         table.getColumnModel().getColumn(1).setHeaderRenderer(new ImageHeaderRenderer("panic.png"));
         table.getColumnModel().getColumn(2).setHeaderRenderer(new ImageHeaderRenderer("food.png"));
@@ -116,12 +115,14 @@ public class GuiMain extends JFrame {
             Expense exp = list.get(i);
             tableModel.addRow(new Object[]{
                     i + 1,
-                    "€" + exp.getAmount(),
+                    exp.getAmount() != null ? "€" + exp.getAmount() : "€0.00",
                     exp.getCategory(),
                     exp.getDate(),
                     exp.getDescription()
             });
-            total = total.add(exp.getAmount());
+            if (exp.getAmount() != null) {
+                total = total.add(exp.getAmount());
+            }
         }
 
         totalSpentLabel.setText("Total Spent: €" + total);
@@ -141,7 +142,10 @@ public class GuiMain extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, fields, "Add New Expense", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             try {
-                BigDecimal amount = new BigDecimal(amountField.getText().trim());
+                // Автоматическая замена запятой на точку для BigDecimal
+                String amountText = amountField.getText().trim().replace(",", ".");
+                BigDecimal amount = new BigDecimal(amountText);
+
                 String category = categoryField.getText().trim();
                 String desc = descField.getText().trim();
 
@@ -149,7 +153,7 @@ public class GuiMain extends JFrame {
                 service.addExpense(newExp);
                 refreshTable();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid amount format!", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Invalid amount format! Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -163,7 +167,7 @@ public class GuiMain extends JFrame {
 
         Expense old = service.getAllExpenses().get(selectedRow);
 
-        JTextField amountField = new JTextField(old.getAmount().toString());
+        JTextField amountField = new JTextField(old.getAmount() != null ? old.getAmount().toString() : "");
         JTextField categoryField = new JTextField(old.getCategory());
         JTextField descField = new JTextField(old.getDescription());
 
@@ -176,7 +180,9 @@ public class GuiMain extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, fields, "Edit Expense", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             try {
-                BigDecimal amount = new BigDecimal(amountField.getText().trim());
+                String amountText = amountField.getText().trim().replace(",", ".");
+                BigDecimal amount = new BigDecimal(amountText);
+
                 String category = categoryField.getText().trim();
                 String desc = descField.getText().trim();
 

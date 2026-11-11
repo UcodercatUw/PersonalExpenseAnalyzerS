@@ -5,36 +5,35 @@ import java.util.List;
 
 public class ExpenseService {
     private final JsonStorageService storageService;
-    private final List<Expense> expenses;
+    private List<Expense> expenses;
 
     public ExpenseService() {
         this.storageService = new JsonStorageService();
-        this.expenses = storageService.Load(); // если метод называется с заглавной, укажи Load()
-    }
-
-    public void addExpense(Expense expense) {
-        expenses.add(expense);
-        storageService.save(expenses);
+        this.expenses = storageService.loadExpenses(); // Загружаем при старте
     }
 
     public List<Expense> getAllExpenses() {
         return expenses;
     }
 
+    public void addExpense(Expense expense) {
+        expenses.add(expense);
+        storageService.saveExpenses(expenses); // <--- ВАЖНО: сразу сохраняем в JSON!
+    }
+
+    public void updateExpense(int index, Expense expense) {
+        if (index >= 0 && index < expenses.size()) {
+            expenses.set(index, expense);
+            storageService.saveExpenses(expenses); // <--- И здесь тоже!
+        }
+    }
+
     public boolean deleteExpense(int index) {
         if (index >= 0 && index < expenses.size()) {
             expenses.remove(index);
-            storageService.save(expenses);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean updateExpense(int index, Expense updatedExpense) {
-        if (index >= 0 && index < expenses.size()) {
-            expenses.set(index, updatedExpense);
-            storageService.save(expenses);
+            storageService.saveExpenses(expenses); // <--- И здесь!
         }
         return false;
     }
 }
+
